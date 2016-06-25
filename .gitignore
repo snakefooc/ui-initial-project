@@ -1,2 +1,2 @@
-
-config.codekit
+node_modules
+dist/*
