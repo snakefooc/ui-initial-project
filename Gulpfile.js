@@ -26,6 +26,7 @@ var rimraf = require('rimraf');
 var runSequence = require('run-sequence');
 var path = require('path');
 var notify = require('gulp-notify');
+var vendor = require('gulp-concat-vendor');
 
 
 handlebars.Handlebars.registerHelper(layouts(handlebars.Handlebars));
@@ -69,7 +70,7 @@ gulp.task('sass:optimized', function() {
 gulp.task('sass', ['sass:lint', 'sass:build']);
 
 gulp.task('js:build', function() {
-  return gulp.src('src/assets/js/**/*.js')
+  return gulp.src('src/assets/js/*.js')
     .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(uglify())
@@ -78,17 +79,23 @@ gulp.task('js:build', function() {
 });
 
 gulp.task('js:lint', function() {
-  return gulp.src(['./src/assets/js/**/*.js', '!./src/assets/js/lib/**/*.js', 'Gulpfile.js'])
+  return gulp.src(['./src/assets/js/*.js', '!./src/assets/js/lib/*.js', 'Gulpfile.js'])
     .pipe(plumber())
       .pipe(jscs())
     .pipe(jshint())
     .pipe(jshint.reporter('default'));
 });
 
-gulp.task('js', ['js:lint', 'js:build']);
+gulp.task('scripts:build', function() {
+    gulp.src('./src/assets/js/lib/*')
+        .pipe(vendor('scripts.min.js'))
+        .pipe(gulp.dest('./dist/assets/js'));  
+});
+
+gulp.task('js', ['js:lint', 'js:build', 'scripts:build']);
 
 gulp.task('images', function() {
-  return gulp.src('src/assets/img/**/*')
+  return gulp.src('src/assets/img/*')
     .pipe(plumber())
     .pipe(imagemin({
       progressive: true,
@@ -176,6 +183,8 @@ gulp.task('serve', ['build'], function() {
 
   // Serve files from the root of this project
   browserSync.init(['./dist/**/*'], {
+    injectChanges: true,
+
     ghostMode: {
       clicks: false,
       forms: false,
