@@ -154,7 +154,7 @@ gulp.task('clean', function(cb) {
 
 gulp.task('watch', function() {
   gulp.watch(['./src/templates/**/*.hbs', './src/templates/*.hbs', './src/partials/**/*.hbs', './src/partials/*.hbs'], ['templates'], reload);
-  gulp.watch(['./src/assets/sass/**/*.scss', './src/assets/sass/*.scss', './src/assets/css/*.css']], ['sass'], reload);
+  gulp.watch(['./src/assets/sass/**/*.scss', './src/assets/sass/*.scss', './src/assets/css/*.css'], ['sass'], reload);
   gulp.watch(['./src/assets/img/**/*', './src/assets/img/*' ], ['images'], reload);
   gulp.watch(['./src/assets/fonts/**/*', './src/assets/fonts/*' ], ['fonts'], reload);
   gulp.watch(['./src/assets/js/**/*.js', './src/assets/js/*.js', 'Gulpfile.js'], ['js'], reload);
