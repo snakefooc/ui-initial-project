@@ -29,6 +29,7 @@ var notify = require('gulp-notify');
 var vendor = require('gulp-concat-vendor');
 
 
+
 handlebars.Handlebars.registerHelper(layouts(handlebars.Handlebars));
 
 gulp.task('sass:lint', function() {
@@ -69,6 +70,15 @@ gulp.task('sass:optimized', function() {
 
 gulp.task('sass', ['sass:lint', 'sass:build']);
 
+gulp.task('js:build', function() {
+  return gulp.src('src/assets/js/*.js')
+    .pipe(plumber())
+    .pipe(sourcemaps.init())
+    .pipe(uglify())
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest('dist/assets/js'));
+});
+
 gulp.task('js:lint', function() {
   return gulp.src(['./src/assets/js/*.js', '!./src/assets/js/lib/*.js', 'Gulpfile.js'])
     .pipe(plumber())
@@ -78,12 +88,12 @@ gulp.task('js:lint', function() {
 });
 
 gulp.task('scripts:build', function() {
-    gulp.src(['./src/assets/js/lib/*','./src/assets/js/*.js'])
+    gulp.src('./src/assets/js/lib/*')
         .pipe(vendor('scripts.min.js'))
-        .pipe(gulp.dest('./dist/assets/js'));
+        .pipe(gulp.dest('./dist/assets/js'));  
 });
 
-gulp.task('js', ['js:lint', 'scripts:build']);
+gulp.task('js', ['js:lint', 'js:build', 'scripts:build']);
 
 gulp.task('images', function() {
   return gulp.src('src/assets/img/*')
@@ -153,11 +163,13 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('watch', function() {
-  gulp.watch(['./src/templates/**/*.hbs', './src/templates/*.hbs', './src/partials/**/*.hbs', './src/partials/*.hbs'], ['templates'], reload);
-  gulp.watch(['./src/assets/sass/**/*.scss', './src/assets/sass/*.scss', './src/assets/css/*.css'], ['sass'], reload);
-  gulp.watch(['./src/assets/img/**/*', './src/assets/img/*' ], ['images'], reload);
-  gulp.watch(['./src/assets/fonts/**/*', './src/assets/fonts/*' ], ['fonts'], reload);
-  gulp.watch(['./src/assets/js/**/*.js', './src/assets/js/*.js', 'Gulpfile.js'], ['js'], reload);
+  gulp.watch(['./src/templates/**/*.hbs', './src/templates/*.hbs', './src/partials/**/*.hbs'], ['templates'], reload);
+  gulp.watch(['./src/assets/sass/*.scss', './src/assets/sass/**/*.scss'], ['sass'], reload);
+  gulp.watch(['./src/assets/img/*', './src/assets/img/**/*'], ['images'], reload);
+  gulp.watch(['./src/assets/fonts/*', './src/assets/fonts/**/*'], ['fonts'], reload);
+  gulp.watch(['./src/assets/css/*', './src/assets/css/**/*'], ['css'], reload);
+  gulp.watch(['./src/assets/js/*.js', './src/assets/js/**/*.js', 'Gulpfile.js'], ['js'], reload);
+  
 });
 
 gulp.task('build', function (cb) {
