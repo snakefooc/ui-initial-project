@@ -72,6 +72,7 @@ gulp.task('sass', ['sass:lint', 'sass:build']);
 
 gulp.task('js:build', function() {
   return gulp.src('src/assets/js/*.js')
+    .pipe(rename({suffix: '.min'}))
     .pipe(plumber())
     .pipe(sourcemaps.init())
     .pipe(uglify())
@@ -163,12 +164,12 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('watch', function() {
-  gulp.watch(['./src/templates/**/*.hbs', './src/templates/*.hbs', './src/partials/**/*.hbs'], ['templates'], reload);
-  gulp.watch(['./src/assets/sass/*.scss', './src/assets/sass/**/*.scss'], ['sass'], reload);
-  gulp.watch(['./src/assets/img/*', './src/assets/img/**/*'], ['images'], reload);
-  gulp.watch(['./src/assets/fonts/*', './src/assets/fonts/**/*'], ['fonts'], reload);
-  gulp.watch(['./src/assets/css/*', './src/assets/css/**/*'], ['css'], reload);
-  gulp.watch(['./src/assets/js/*.js', './src/assets/js/**/*.js', 'Gulpfile.js'], ['js'], reload);
+  gulp.watch(['src/templates/**/*.hbs', 'src/templates/*.hbs', 'src/partials/**/*.hbs'], ['templates'], reload);
+  gulp.watch(['src/assets/sass/*.scss', 'src/assets/sass/**/*.scss'], ['sass'], reload);
+  gulp.watch(['src/assets/img/*', 'src/assets/img/**/*'], ['images'], reload);
+  gulp.watch(['src/assets/fonts/*', 'src/assets/fonts/**/*'], ['fonts'], reload);
+  gulp.watch(['src/assets/css/*', 'src/assets/css/**/*'], ['css'], reload);
+  gulp.watch(['src/assets/js/*.js', 'src/assets/js/**/*.js', 'Gulpfile.js'], ['js'], reload);
   
 });
 
