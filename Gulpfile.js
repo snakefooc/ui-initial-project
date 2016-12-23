@@ -97,7 +97,7 @@ gulp.task('scripts:build', function() {
 gulp.task('js', ['js:lint', 'js:build', 'scripts:build']);
 
 gulp.task('images', function() {
-  return gulp.src('src/assets/img/*')
+  return gulp.src('src/assets/img/**/*')
     .pipe(plumber())
     .pipe(imagemin({
       progressive: true,
