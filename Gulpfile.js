@@ -13,6 +13,7 @@ var inlinesource = require('gulp-inline-source');
 var jscs = require('gulp-jscs');
 var jshint = require('gulp-jshint');
 var layouts = require('handlebars-layouts');
+var helper = require('handlebars-helper-repeat');
 var plumber = require('gulp-plumber');
 var reload = browserSync.reload;
 var rename = require('gulp-rename');
@@ -31,6 +32,7 @@ var vendor = require('gulp-concat-vendor');
 
 
 handlebars.Handlebars.registerHelper(layouts(handlebars.Handlebars));
+handlebars.Handlebars.registerHelper('repeat', helper);
 
 gulp.task('sass:lint', function() {
   gulp.src('./src/assets/sass/*.scss')
