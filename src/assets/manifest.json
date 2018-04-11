@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "main.js": {
+      "files": [
+        "js/services/**/*.js",
+        "js/controllers/**/*.js",
+        "js/directives/**/*.js",
+        "js/main.js"
+      ],
+      "main": true
+    },
+    "style.css": {
+      "files": "sass/style.scss",
+      
+      "main": true
+    }
+   
+  },
+  "paths": {
+    "source": "./src/assets/",
+    "dist": "./dist/assets/"
+  },
+  "config": {
+    "devUrl": "example.dev"
+  }
+}

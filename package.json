@@ -5,9 +5,11 @@
   "license": "MIT",
   "scripts": {},
   "dependencies": {
-    "handlebars-helper-repeat": "^1.0.0"
+    "handlebars-helper-repeat": "^1.0.0",
+    "main-bower-files": "^2.13.1"
   },
   "devDependencies": {
+    "asset-builder": "^1.1.0",
     "browser-sync": "2.14.0",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.0",
