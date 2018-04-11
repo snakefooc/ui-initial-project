@@ -147,13 +147,13 @@ gulp.task('images', function() {
 });
 
 gulp.task('images:optimized', function() {
-  return gulp.src('src/assets/img/**/*')
+  return gulp.src(globs.img)
     .pipe(plumber())
     .pipe(imagemin({
       progressive: true,
       multipass: true,
     }))
-    .pipe(gulp.dest('./dist/assets/img'));
+    .pipe(gulp.dest(path.dist + 'img'))
 });
 
 gulp.task('css', function() {
