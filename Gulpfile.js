@@ -138,12 +138,12 @@ gulp.task('scripts:build', function() {
 gulp.task('js', ['js:lint', 'js:build', 'scripts:build']);
 
 gulp.task('images', function() {
-  return gulp.src('src/assets/img/**/*')
+   return gulp.src(globs.img)
     .pipe(plumber())
     .pipe(imagemin({
       progressive: true,
     }))
-    .pipe(gulp.dest('./dist/assets/img'));
+    .pipe(gulp.dest(path.dist + 'img'));
 });
 
 gulp.task('images:optimized', function() {
@@ -153,7 +153,7 @@ gulp.task('images:optimized', function() {
       progressive: true,
       multipass: true,
     }))
-    .pipe(gulp.dest(path.dist + 'img'))
+    .pipe(gulp.dest(path.dist + 'img'));
 });
 
 gulp.task('css', function() {
@@ -167,7 +167,7 @@ gulp.task('fonts', function() {
   return gulp.src(globs.fonts)
     .pipe(plumber())
     //.pipe(gulp.dest('./dist/assets/fonts'));
-    .pipe(gulp.dest(path.dist + 'fonts'))
+    .pipe(gulp.dest(path.dist + 'fonts'));
 });
 
 gulp.task('templates', function() {

@@ -2,9 +2,6 @@
   "dependencies": {
     "main.js": {
       "files": [
-        "js/services/**/*.js",
-        "js/controllers/**/*.js",
-        "js/directives/**/*.js",
         "js/main.js"
       ],
       "main": true
@@ -13,8 +10,19 @@
       "files": "sass/style.scss",
       
       "main": true
+    },
+    "jquery.js": {
+      "bower": ["jquery"]
+    },
+    "modernizr.js": {
+      "bower": ["modernizr"]
+    },
+    "fonts": {
+      "files": ["fonts/**/*"]
+    },
+    "images": {
+      "files": ["img/**/*"]
     }
-   
   },
   "paths": {
     "source": "./src/assets/",
