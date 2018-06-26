@@ -138,7 +138,7 @@ gulp.task('scripts:build', function() {
 gulp.task('js', ['js:lint', 'js:build', 'scripts:build']);
 
 gulp.task('images', function() {
-   return gulp.src(globs.img)
+   return gulp.src(globs.images)
     .pipe(plumber())
     .pipe(imagemin({
       progressive: true,
@@ -147,7 +147,7 @@ gulp.task('images', function() {
 });
 
 gulp.task('images:optimized', function() {
-  return gulp.src(globs.img)
+  return gulp.src(globs.images)
     .pipe(plumber())
     .pipe(imagemin({
       progressive: true,
