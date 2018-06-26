@@ -1,0 +1,34 @@
+{
+  "dependencies": {
+    "main.js": {
+      "files": [
+        "js/main.js"
+      ],
+      "main": true
+    },
+    "style.css": {
+      "files": "sass/style.scss",
+      
+      "main": true
+    },
+    "jquery.js": {
+      "bower": ["jquery"]
+    },
+    "modernizr.js": {
+      "bower": ["modernizr"]
+    },
+    "fonts": {
+      "files": ["fonts/**/*"]
+    },
+    "images": {
+      "files": ["img/**/*"]
+    }
+  },
+  "paths": {
+    "source": "./src/assets/",
+    "dist": "./dist/assets/"
+  },
+  "config": {
+    "devUrl": "example.dev"
+  }
+}
