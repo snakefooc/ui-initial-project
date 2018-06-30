@@ -6,5 +6,13 @@
     "Luis Esquivel <snakefooc@gmail.com>"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/snakefooc/ui-initial-project"
+  "homepage": "https://github.com/snakefooc/ui-initial-project",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
 }
