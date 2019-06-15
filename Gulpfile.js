@@ -1,34 +1,34 @@
 'use strict';
+const { src, dest, parallel, series, watch } = require('gulp');
 
-var autoprefixer = require('gulp-autoprefixer');
-var browserSync = require('browser-sync').create();
-var cache = require('gulp-cached');
-var cssnano = require('gulp-cssnano');
-var fs = require('fs');
-var gulp = require('gulp');
-var handlebars = require('gulp-compile-handlebars');
-var htmlmin = require('gulp-htmlmin');
-var imagemin = require('gulp-imagemin');
-var inlinesource = require('gulp-inline-source');
-var jscs = require('gulp-jscs');
-var jshint = require('gulp-jshint');
-var layouts = require('handlebars-layouts');
-var helper = require('handlebars-helper-repeat');
-var plumber = require('gulp-plumber');
-var reload = browserSync.reload;
-var rename = require('gulp-rename');
-var replace = require('gulp-replace');
-var sass = require('gulp-sass');
-var scsslint = require('gulp-scss-lint');
-var sourcemaps = require('gulp-sourcemaps');
-var uglify = require('gulp-uglify');
-var yaml = require('js-yaml');
-var rimraf = require('rimraf');
-var runSequence = require('run-sequence');
-var path = require('path');
-var notify = require('gulp-notify');
-var vendor = require('gulp-concat-vendor');
-var mainBowerFiles = require('main-bower-files');
+const browsersync = require("browser-sync").create();
+const cache = require('gulp-cached');
+const fs = require('fs');
+const handlebars = require('gulp-compile-handlebars');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+const cssnano = require('cssnano');
+const htmlmin = require('gulp-htmlmin');
+const imagemin = require('gulp-imagemin');
+const inlinesource = require('gulp-inline-source');
+const jshint = require('gulp-jshint');
+const layouts = require('handlebars-layouts');
+const helper = require('handlebars-helper-repeat');
+const plumber = require('gulp-plumber');
+const reload = browserSync.reload;
+const rename = require('gulp-rename');
+const replace = require('gulp-replace');
+const sass = require('gulp-sass');
+const scsslint = require('gulp-scss-lint');
+const sourcemaps = require('gulp-sourcemaps');
+const uglify = require('gulp-uglify');
+const yaml = require('js-yaml');
+const rimraf = require('rimraf');
+const runSequence = require('run-sequence');
+const path = require('path');
+const notify = require('gulp-notify');
+const vendor = require('gulp-concat');
+const mainBowerFiles = require('main-bower-files');
 
 handlebars.Handlebars.registerHelper(layouts(handlebars.Handlebars));
 handlebars.Handlebars.registerHelper('repeat', helper);
@@ -39,7 +39,7 @@ var manifest = require('asset-builder')('./src/assets/manifest.json');
 // `path` - Paths to base asset directories. With trailing slashes.
 // - `path.source` - Path to the source files. Default: `assets/`
 // - `path.dist` - Path to the build directory. Default: `dist/`
-var path = manifest.paths;
+var paths = manifest.paths;
 
 // `config` - Store arbitrary configuration values here.
 var config = manifest.config || {};
@@ -64,115 +64,57 @@ var globs = manifest.globs;
 var project = manifest.getProjectGlobs();
 
 // Path to the compiled assets manifest in the dist directory
-var revManifest = path.dist + 'assets.json';
+var revManifest = paths.dist + 'assets.json';
 
-gulp.task('sass:lint', function() {
-  gulp.src('./src/assets/sass/*.scss')
-    .pipe(plumber())
-    .pipe(scsslint());
-});
 
-gulp.task('sass:build', function() {
-  gulp.src('./src/assets/sass/**/style.scss')
-    .pipe(rename({suffix: '.min'}))
-    .pipe(plumber())
-    .pipe(sourcemaps.init())
-    .pipe(sass({
-      outputStyle: 'compressed',
-      errLogToConsole: false,
-      onError: function(err) {
-          return notify().write(err);
-      }
-    }))
-    .pipe(autoprefixer())
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('./dist/assets/css/'))
-    .pipe(notify({ message: 'Styles task complete' }));
-});
-
-gulp.task('sass:optimized', function() {
-  return gulp.src('./src/assets/sass/**/style.scss')
-    .pipe(rename({suffix: '.min'}))
+function scss() {
+  return src('./src/assets/sass/*.scss')    
     .pipe(plumber())
     .pipe(sass({
       outputStyle: 'compressed',
     }))
-    .pipe(autoprefixer())
-    .pipe(cssnano({compatibility: 'ie8'}))
-    .pipe(gulp.dest('dist/assets/css/'));
-});
-
-gulp.task('sass', ['sass:lint', 'sass:build']);
-
-gulp.task('js:build', function() {
-  return gulp.src('src/assets/js/*.js')
     .pipe(rename({suffix: '.min'}))
+    .pipe(postcss([ autoprefixer(), cssnano() ])) // PostCSS plugins
+    .pipe(dest(paths.dist + 'css'))
+    .pipe(browsersync.stream());
+}
+
+function css() {
+  return src('./src/assets/css/*.css')
     .pipe(plumber())
-    .pipe(sourcemaps.init())
-    .pipe(uglify())
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('dist/assets/js'));
-});
+    .pipe(dest(paths.dist + 'css'))
+    .pipe(browsersync.stream());
+}
 
-gulp.task('js:lint', function() {
-  return gulp.src(['./src/assets/js/*.js', '!./src/assets/js/lib/*.js', 'Gulpfile.js'])
-    .pipe(plumber())
-      .pipe(jscs())
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'));
-});
-
-gulp.task('scripts:build', function() {
-    return gulp.src(mainBowerFiles('**/*.js'))
-        .pipe(vendor('scripts.min.js'))
-        .pipe(gulp.dest('./dist/assets/js'));  
-});
-/*
-gulp.task('scripts:build', function() {
-    gulp.src('./src/assets/js/lib/*')
-        .pipe(vendor('scripts.min.js'))
-        .pipe(gulp.dest('./dist/assets/js'));  
-});
-*/
-
-gulp.task('js', ['js:lint', 'js:build', 'scripts:build']);
-
-gulp.task('images', function() {
-   return gulp.src(globs.images)
+function images() {
+  return src(globs.images)
     .pipe(plumber())
     .pipe(imagemin({
       progressive: true,
     }))
-    .pipe(gulp.dest(path.dist + 'img'));
-});
+    .pipe(dest(paths.dist + 'img'))
+    .pipe(browsersync.stream());
 
-gulp.task('images:optimized', function() {
-  return gulp.src(globs.images)
+}
+
+
+function fonts() {
+  return src('./src/assets/fonts/*')
     .pipe(plumber())
-    .pipe(imagemin({
-      progressive: true,
-      multipass: true,
-    }))
-    .pipe(gulp.dest(path.dist + 'img'));
-});
+    .pipe(dest(paths.dist + 'fonts'))
+    .pipe(browsersync.stream());
+}
 
-gulp.task('css', function() {
-  return gulp.src('src/assets/css/*.css')
+function email() {
+  return src('./src/mail/**/**')
     .pipe(plumber())
-    .pipe(gulp.dest('./dist/assets/css'));
-});
+    .pipe(dest('./dist/mail'))
+    .pipe(browsersync.stream());
+}
 
-gulp.task('fonts', function() {
-  //return gulp.src('src/assets/fonts/*')
-  return gulp.src(globs.fonts)
-    .pipe(plumber())
-    //.pipe(gulp.dest('./dist/assets/fonts'));
-    .pipe(gulp.dest(path.dist + 'fonts'));
-});
-
-gulp.task('templates', function() {
-  var templateData = yaml.safeLoad(fs.readFileSync('data.yml', 'utf-8'));
-  var options = {
+function template() {
+  const templateData = yaml.safeLoad(fs.readFileSync('data.yml', 'utf-8'));
+  const options = {
     ignorePartials: true, //ignores the unknown footer2 partial in the handlebars template, defaults to false
     batch: ['./src/partials/'],
     helpers: {
@@ -181,56 +123,46 @@ gulp.task('templates', function() {
       },
     },
   };
-
-  return gulp.src('./src/templates/**/*.hbs')
+  return src('./src/templates/**/*.hbs')
     .pipe(plumber())
     .pipe(handlebars(templateData, options))
     .pipe(rename(function(path) {
       path.extname = '.html';
     }))
-    .pipe(gulp.dest('dist'));
-});
+    .pipe(dest('./dist/'))
+    .pipe(browsersync.stream());
+}
 
-gulp.task('templates:optimized', ['templates'], function() {
-  return gulp.src('./dist/**/*.html')
-    .pipe(inlinesource())
-    .pipe(replace(/\.\.\//g, ''))
-    .pipe(htmlmin({
-      collapseWhitespace: true,
-      removeComments: true,
-    }))
-    .pipe(gulp.dest('./dist/'));
-});
+function scripts() {
+  return src('src/assets/js/*.js')
+    .pipe(rename({suffix: '.min'}))  
+    .pipe(plumber()) 
+    .pipe(uglify())
+    .pipe(dest(paths.dist + 'js'))
+    .pipe(browsersync.stream());
+}
+function plugins() {
+  return src(mainBowerFiles('**/*.js'))
+    .pipe(vendor('scripts.min.js'))
+    .pipe(dest(paths.dist + 'js'))
+    .pipe(browsersync.stream());
+}
 
-gulp.task('clean', function(cb) {
+function clean(cb) {
   return rimraf('./dist/', cb);
-});
+}
 
-gulp.task('watch', function() {
-  gulp.watch(['src/templates/**/*.hbs', 'src/templates/*.hbs', 'src/partials/**/*.hbs'], ['templates'], reload);
-  gulp.watch(['src/assets/sass/*.scss', 'src/assets/sass/**/*.scss'], ['sass'], reload);
-  gulp.watch(['src/assets/img/*', 'src/assets/img/**/*'], ['images'], reload);
-  gulp.watch(['src/assets/fonts/*', 'src/assets/fonts/**/*'], ['fonts'], reload);
-  gulp.watch(['src/assets/css/*', 'src/assets/css/**/*'], ['css'], reload);
-  gulp.watch(['src/assets/js/*.js', 'src/assets/js/**/*.js', 'Gulpfile.js', 'bower.json'], ['js'], reload);
-  
-});
+var cbString = new Date().getTime();
+function cacheBustTask(){
+    return src(['index.html'])
+        .pipe(replace(/cb=\d+/, 'cb=' + cbString))
+        .pipe(dest('.'));
+}
 
-gulp.task('build', function (cb) {
-  return runSequence('clean', ['sass', 'css', 'images', 'fonts', 'js', 'templates'], cb);
-});
+// BrowserSync
+function browserSync(done) {
+  browsersync.init({
 
-gulp.task('build:optimized', function(cb) {
-  return runSequence('clean',
-    ['sass:optimized', 'css', 'images:optimized', 'fonts', 'js', 'templates:optimized'],
-    cb);
-});
-
-// use default task to launch Browsersync and watch JS files
-gulp.task('serve', ['build'], function() {
-
-  // Serve files from the root of this project
-  browserSync.init(['./dist/**/*'], {
     injectChanges: true,
 
     ghostMode: {
@@ -239,11 +171,57 @@ gulp.task('serve', ['build'], function() {
       scroll: false,
     },
     server: {
-      baseDir: './dist',
-    }
+      baseDir: "./dist/"
+    },
+    port: 3000
   });
+  done();
+}
 
-  // add browserSync.reload to the tasks array to make
-  // all browsers reload after tasks are complete.
-  gulp.start(['watch']);
-});
+// BrowserSync Reload
+function browserSyncReload(done) {
+  browsersync.reload();
+  done();
+}
+
+
+// Watch files
+function watchFiles() {
+  watch("src/assets/css/**/*", series(css, browserSyncReload));
+  watch([
+    "src/assets/sass/**/*"
+  ],
+    series(scss, browserSyncReload)
+  );
+  watch([
+    "src/assets/js/**/*",
+  ],
+    series(plugins, scripts, browserSyncReload)
+  );
+  watch(
+    [
+      "src/templates/**/*",
+      "src/partials/**/*"
+    ],
+    series(template, browserSyncReload)
+  );
+  watch("src/assets/fonts/**/*", series(fonts, browserSyncReload));
+  watch("src/assets/img/**/*", series(images, browserSyncReload));
+}
+
+
+// define complex tasks
+const js = series(plugins, scripts);
+const build = series(clean, parallel(css, scss, images, template, js, fonts, email));
+const serve = parallel(watchFiles, browserSync);
+
+exports.fonts = fonts;
+exports.images = images;
+exports.css = css;
+exports.scss = scss;
+exports.email = email;
+exports.clean = clean;
+exports.js = js;
+exports.build = build;
+exports.serve = serve;
+exports.default = build;
