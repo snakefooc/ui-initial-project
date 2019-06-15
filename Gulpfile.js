@@ -25,7 +25,6 @@ const uglify = require('gulp-uglify');
 const yaml = require('js-yaml');
 const rimraf = require('rimraf');
 const runSequence = require('run-sequence');
-const path = require('path');
 const notify = require('gulp-notify');
 const vendor = require('gulp-concat');
 const mainBowerFiles = require('main-bower-files');
@@ -39,7 +38,7 @@ var manifest = require('asset-builder')('./src/assets/manifest.json');
 // `path` - Paths to base asset directories. With trailing slashes.
 // - `path.source` - Path to the source files. Default: `assets/`
 // - `path.dist` - Path to the build directory. Default: `dist/`
-var paths = manifest.paths;
+var path = manifest.paths;
 
 // `config` - Store arbitrary configuration values here.
 var config = manifest.config || {};
@@ -64,8 +63,7 @@ var globs = manifest.globs;
 var project = manifest.getProjectGlobs();
 
 // Path to the compiled assets manifest in the dist directory
-var revManifest = paths.dist + 'assets.json';
-
+var revManifest = path.dist + 'assets.json';
 
 function scss() {
   return src('./src/assets/sass/*.scss')    
@@ -75,14 +73,14 @@ function scss() {
     }))
     .pipe(rename({suffix: '.min'}))
     .pipe(postcss([ autoprefixer(), cssnano() ])) // PostCSS plugins
-    .pipe(dest(paths.dist + 'css'))
+    .pipe(dest(path.dist + 'css'))
     .pipe(browsersync.stream());
 }
 
 function css() {
   return src('./src/assets/css/*.css')
     .pipe(plumber())
-    .pipe(dest(paths.dist + 'css'))
+    .pipe(dest(path.dist + 'css'))
     .pipe(browsersync.stream());
 }
 
@@ -92,16 +90,15 @@ function images() {
     .pipe(imagemin({
       progressive: true,
     }))
-    .pipe(dest(paths.dist + 'img'))
+    .pipe(dest(path.dist + 'img'))
     .pipe(browsersync.stream());
 
 }
 
-
 function fonts() {
-  return src('./src/assets/fonts/*')
+  return src(globs.fonts)
     .pipe(plumber())
-    .pipe(dest(paths.dist + 'fonts'))
+    .pipe(dest(path.dist + 'fonts'))
     .pipe(browsersync.stream());
 }
 
@@ -138,13 +135,13 @@ function scripts() {
     .pipe(rename({suffix: '.min'}))  
     .pipe(plumber()) 
     .pipe(uglify())
-    .pipe(dest(paths.dist + 'js'))
+    .pipe(dest(path.dist + 'js'))
     .pipe(browsersync.stream());
 }
 function plugins() {
   return src(mainBowerFiles('**/*.js'))
     .pipe(vendor('scripts.min.js'))
-    .pipe(dest(paths.dist + 'js'))
+    .pipe(dest(path.dist + 'js'))
     .pipe(browsersync.stream());
 }
 
@@ -154,7 +151,7 @@ function clean(cb) {
 
 var cbString = new Date().getTime();
 function cacheBustTask(){
-    return src(['index.html'])
+    return src(['./src/partials/base.hbs'])
         .pipe(replace(/cb=\d+/, 'cb=' + cbString))
         .pipe(dest('.'));
 }
