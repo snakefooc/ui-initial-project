@@ -139,7 +139,7 @@ function scripts() {
     .pipe(browsersync.stream());
 }
 function plugins() {
-  return src(mainBowerFiles('**/*.js'))
+  return src(mainBowerFiles('**/*.min.js'))
     .pipe(vendor('scripts.min.js'))
     .pipe(dest(path.dist + 'js'))
     .pipe(browsersync.stream());
