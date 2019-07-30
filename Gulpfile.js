@@ -139,8 +139,10 @@ function scripts() {
     .pipe(browsersync.stream());
 }
 function plugins() {
-  return src(mainBowerFiles('**/*.min.js'))
+  return src(mainBowerFiles('**/*.js'))
     .pipe(vendor('scripts.min.js'))
+    .pipe(plumber()) 
+    .pipe(uglify())
     .pipe(dest(path.dist + 'js'))
     .pipe(browsersync.stream());
 }
