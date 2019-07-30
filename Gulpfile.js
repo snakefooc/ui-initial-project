@@ -210,7 +210,7 @@ function watchFiles() {
 // define complex tasks
 const js = series(plugins, scripts);
 const build = series(clean, parallel(css, scss, images, template, js, fonts, email));
-const serve = parallel(watchFiles, browserSync);
+const serve = series(clean, parallel(build, watchFiles, browserSync));
 
 exports.fonts = fonts;
 exports.images = images;
